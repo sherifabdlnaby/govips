@@ -94,17 +94,11 @@ func NewImageFromRef(ref *ImageRef) *ImageRef {
 }
 
 // NewImageRef create a new ImageRef from an existing ImageRef
-// Deprecated: Use vips.NewImageFromRef instead. using this may leads to segmentation fault. to avoid it you must
-// keep reference to the buffer used to create the passed VipsImage
 func NewImageRef(vipsImage *C.VipsImage, format ImageType) *ImageRef {
 	stream := &ImageRef{
 		image:  vipsImage,
 		format: format,
 	}
-
-	// Increment Ref as now that we have a new object pointing to the same VipsImage
-	C.g_object_ref(C.gpointer(stream.image))
-
 	runtime.SetFinalizer(stream, finalizeImage)
 	return stream
 }
