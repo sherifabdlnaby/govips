@@ -78,19 +78,16 @@ func NewImageFromBuffer(buf []byte, opts ...LoadOption) (*ImageRef, error) {
 }
 
 // NewImageFromRef create a new ImageRef from an existing ImageRef
-func NewImageFromRef(ref *ImageRef) *ImageRef {
-	stream := &ImageRef{
-		image:  ref.image,
-		format: ref.format,
-		buf:    ref.buf,
+func NewImageFromRef(ref *ImageRef) (*ImageRef, error) {
+
+	ptr, err := vipsCopyImage(ref.Image())
+	if err != nil {
+		return nil, err
 	}
 
-	// Increment Ref as now that we have a new object pointing to the same VipsImage
-	C.g_object_ref(C.gpointer(stream.image))
+	nref := NewImageRef(ptr, ref.Format())
 
-	runtime.SetFinalizer(stream, finalizeImage)
-
-	return stream
+	return nref, nil
 }
 
 // NewImageRef create a new ImageRef from an existing ImageRef
